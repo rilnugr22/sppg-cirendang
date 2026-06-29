@@ -17,6 +17,7 @@ return new class extends Migration
         $table->string('tipe',50);
         $table->text('konten');
         $table->date('tanggal_publish');
+        $table->string('gambar')->nullable();
         $table->timestamps();
     });
 }

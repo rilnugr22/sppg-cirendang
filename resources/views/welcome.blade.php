@@ -30,7 +30,7 @@
     <section id="beranda" class="pt-16">
         <div class="relative bg-gray-900 h-[60vh] flex items-center justify-center text-center">
             <div class="absolute inset-0 overflow-hidden opacity-40">
-                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80" class="w-full h-full object-cover" alt="Banner Gizi">
+                <img src="{{ asset('img/bangunansppg.jpg') }}" class="w-full h-full object-cover" alt="Banner Gizi">
             </div>
             <div class="relative z-10 px-4 max-w-4xl mx-auto text-white">
                 <h1 class="text-4xl md:text-5xl font-extrabold mb-4">Gizi Seimbang untuk Generasi Emas</h1>
@@ -99,9 +99,13 @@
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
                 @foreach($allTim as $tim)
                     <div class="flex flex-col items-center bg-white p-4 rounded-xl shadow-sm border">
-                        <div class="w-24 h-24 rounded-full bg-[#B5CFFE] flex items-center justify-center text-[#0D2D69] text-2xl font-bold mb-4 overflow-hidden">
-                            {{ substr($tim->nama, 0, 1) }}
-                        </div>
+                        <div class="w-24 h-24 rounded-full bg-[#B5CFFE] flex items-center justify-center text-2xl font-bold mb-4 overflow-hidden">
+                            @if($tim->foto)
+                            <img src="{{ asset('uploads/tim/' . $tim->foto) }}" class="w-full h-full object-cover">
+                            @else
+                            <span class="font-bold text-sm text-[#0D2D69]">{{ substr($tim->nama, 0, 1) }}</span>
+                            @endif
+                            </div>
                         <h3 class="font-bold text-md text-gray-900">{{ $tim->nama }}</h3>
                         <p class="text-xs text-gray-500">{{ $tim->jabatan }}</p>
                     </div>
@@ -163,39 +167,51 @@
         </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            @forelse($allEdukasi as $edukasi)
-                <div class="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition duration-300 flex flex-col justify-between">
-                    <div>
-                        <div class="relative h-48 bg-gray-200">
-                            <img src="{{ $edukasi->tipe == 'Video' ? 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80' }}" 
-                                 alt="{{ $edukasi->judul }}" 
-                                 class="w-full h-full object-cover">
-                            
-                            <span class="absolute top-3 left-3 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs
-                                {{ $edukasi->tipe == 'Video' ? 'bg-red-600 text-white' : 'bg-[#0D2D69] text-white' }}">
-                                {{ $edukasi->tipe }}
-                            </span>
-                        </div>
-
-                        <div class="p-6">
-                            <p class="text-xs text-gray-400 mb-2">
-                                Diterbitkan: {{ \Carbon\Carbon::parse($edukasi->tanggal_publish)->translatedFormat('d F Y') }}
-                            </p>
-                            <h3 class="font-bold text-xl text-gray-900 mb-3 leading-snug">{{ $edukasi->judul }}</h3>
-                            <p class="text-sm text-gray-600 leading-relaxed">{{ Str::limit($edukasi->konten, 120, '...') }}</p>
-                        </div>
-                    </div>
+    @forelse($allEdukasi as $edukasi)
+        <div class="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition duration-300 flex flex-col justify-between">
+            <div>
+                <div class="relative h-48 bg-gray-200">
                     
-                    <div class="p-6 pt-0 mt-auto">
-                        <a href="#" class="inline-flex items-center text-sm font-bold text-[#071E48] hover:text-[#0D2D69] gap-1 mt-2">
-                            {{ $edukasi->tipe == 'Video' ? 'Tonton Video' : 'Baca Selengkapnya' }} ➔
-                        </a>
-                    </div>
+                    <!-- LOGIKA GAMBAR DINAMIS & FALLBACK -->
+                    @if(!empty($edukasi->gambar))
+                        <!-- Jika ada data gambar di database, panggil dari folder storage -->
+                        <!-- Ditambahkan fungsi 'onerror' jika file fisik di folder storage belum di-upload -->
+                        <img src="{{ asset('uploads/edukasi/' . $edukasi->gambar) }}" 
+                             alt="{{ $edukasi->judul }}" 
+                             class="w-full h-full object-cover"
+                             onerror="this.onerror=null; this.src='{{ $edukasi->tipe == 'Video' ? 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80' }}';">
+                    @else
+                        <!-- Jika kolom gambar di database kosong, gunakan gambar default Unsplash sesuai tipe konten -->
+                        <img src="{{ $edukasi->tipe == 'Video' ? 'https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=600&q=80' : 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=600&q=80' }}" 
+                             alt="{{ $edukasi->judul }}" 
+                             class="w-full h-full object-cover">
+                    @endif
+                    
+                    <span class="absolute top-3 left-3 text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-md shadow-xs
+                        {{ $edukasi->tipe == 'Video' ? 'bg-red-600 text-white' : 'bg-[#0D2D69] text-white' }}">
+                        {{ $edukasi->tipe }}
+                    </span>
                 </div>
-            @empty
-                <div class="col-span-3 text-center py-12 text-gray-500 border border-dashed rounded-xl">Belum ada artikel atau video edukasi gizi yang diterbitkan.</div>
-            @endforelse
+
+                <div class="p-6">
+                    <p class="text-xs text-gray-400 mb-2">
+                        Diterbitkan: {{ \Carbon\Carbon::parse($edukasi->tanggal_publish)->translatedFormat('d F Y') }}
+                    </p>
+                    <h3 class="font-bold text-xl text-gray-900 mb-3 leading-snug">{{ $edukasi->judul }}</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">{{ Str::limit($edukasi->konten, 120, '...') }}</p>
+                </div>
+            </div>
+            
+            <div class="p-6 pt-0 mt-auto">
+                <a href="#" class="inline-flex items-center text-sm font-bold text-[#071E48] hover:text-[#0D2D69] gap-1 mt-2">
+                    {{ $edukasi->tipe == 'Video' ? 'Tonton Video' : 'Baca Selengkapnya' }} ➔
+                </a>
+            </div>
         </div>
+    @empty
+        <div class="col-span-3 text-center py-12 text-gray-500 border border-dashed rounded-xl">Belum ada artikel atau video edukasi gizi yang diterbitkan.</div>
+    @endforelse
+</div>
     </div>
     </section>
 

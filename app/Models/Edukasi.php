@@ -26,6 +26,7 @@ class Edukasi extends Model
         'tipe',
         'konten',
         'tanggal_publish',
+        'gambar',
     ];
 
     /**
