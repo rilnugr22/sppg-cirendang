@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: sppg-cirendang
-    env: docker
-    plan: free
-    region: singapore
