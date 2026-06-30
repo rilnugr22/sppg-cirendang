@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $super_admin = User::where('email', 'admin@sppg.com')->first();
+        if(empty($super_admin)) {
 
         User::create([
             'name' => 'Admin SPPG',
@@ -23,5 +24,6 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password123'),
      
         ]);
+    }
     }
 }
